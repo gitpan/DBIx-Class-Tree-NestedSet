@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Carp qw/croak/;
-use Data::Dumper;
+#use Data::Dumper;
 use parent 'DBIx::Class';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 $VERSION = eval $VERSION;
 
 __PACKAGE__->mk_classdata( _tree_columns => {} );
