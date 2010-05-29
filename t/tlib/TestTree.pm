@@ -8,7 +8,7 @@ package TestTree;
 # $Log: $
 #
 use Moose;
-use Data::Dumper;
+#use Data::Dumper;
 use Test::More;
 
 use namespace::autoclean;

@@ -8,6 +8,7 @@ WriteMakefile(
     PREREQ_PM         => {
         DBICx::TestDatabase     => 0.01,
         DBIx::Class             => 0.08000,
+        Moose                   => 0.54,
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/DBIx/Class/Tree/NestedSet.pm', # retrieve abstract
