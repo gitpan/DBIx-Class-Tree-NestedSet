@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                DBIx-Class-Tree-NestedSet
-version:             0.05
+version:             0.06
 abstract:            Manage trees of data using the nested set model
 license:             ~
 author:              

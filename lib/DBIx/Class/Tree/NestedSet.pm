@@ -7,7 +7,7 @@ use Carp qw/croak/;
 #use Data::Dumper;
 use parent 'DBIx::Class';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 __PACKAGE__->mk_classdata( _tree_columns => {} );
@@ -35,7 +35,7 @@ sub tree_columns {
             },
         );
 
-        $class->might_have(
+        $class->belongs_to(
             'parent' => $class,
             \%join_cond,{
                 where    => \"child.$left > me.$left AND child.$right < me.$right AND me.$level = child.$level - 1",       #"
@@ -988,7 +988,7 @@ Adding to this relationship creates a rightmost child to C<$node>.
 
   $parent = $node->parent;
 
-A might_have relationship to the parent node of C<$node>s tree.
+A belongs_to relationship to the parent node of C<$node>s tree.
 
 Note that only the root node does not have a parent.
 

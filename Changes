@@ -9,3 +9,6 @@ Revision history for Perl extension DBIx::Class::Tree::NestedSet.
 
 0.05  Sat May 29 07:57:00 2010
     - fixed another dependency in test code
+
+0.06  Sat May 29 11:00:00 2010
+    - Replaced might_have relationship to root with belongs_to
