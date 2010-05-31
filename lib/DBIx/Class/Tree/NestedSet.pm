@@ -7,7 +7,7 @@ use Carp qw/croak/;
 #use Data::Dumper;
 use parent 'DBIx::Class';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 $VERSION = eval $VERSION;
 
 __PACKAGE__->mk_classdata( _tree_columns => {} );
