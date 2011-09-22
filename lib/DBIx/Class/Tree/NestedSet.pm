@@ -7,7 +7,7 @@ use Carp qw/croak/;
 #use Data::Dumper;
 use parent 'DBIx::Class';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 $VERSION = eval $VERSION;
 
 __PACKAGE__->mk_classdata( _tree_columns => {} );
@@ -545,9 +545,51 @@ sub attach_left_sibling {
 # otherwise it comes from the primary key
 #
 sub take_cutting {
+    my $self = shift;
+
+    my ($root, $left, $right, $level) = $self->_get_columns;
+
+    $self->result_source->schema->txn_do(sub {
+        my $p_lft = $self->$left;
+        my $p_rgt = $self->$right;
+        return $self if $p_lft == $p_rgt + 1;
+
+        my $pk = ($self->result_source->primary_columns)[0];
+
+        $self->discard_changes;
+        my $root_id = $self->$root;
+
+        my $p_diff = $p_rgt - $p_lft;
+        my $l_diff = $self->$level - 1;
+        my $new_id = $self->$pk;
+        # I'd love to use $self->descendants->update(...),
+        # but it dies with "_strip_cond_qualifiers() is unable to
+        # handle a condition reftype SCALAR".
+        # tough beans.
+        $self->nodes_rs->search({
+            $root   => $root_id,
+            $left   => {'>=' => $p_lft },
+            $right  => {'<=' => $p_rgt },
+        })->update({
+            $left   => \"$left - $p_lft + 1",
+            $right  => \"$right - $p_lft + 1",
+            $root   => $new_id,
+            $level  => \"$level - $l_diff",
+        });
+
+        # fix up the rest of the tree
+        $self->nodes_rs->search({
+            $root   => $root_id,
+            $left   => { '>=' => $p_rgt},
+        })->update({
+            $left   => \"$left  - $p_diff",
+            $right  => \"$right - $p_diff",
+        });
+    });
+    return $self;
 }
 
-# Move a node to the left
+# Move a node to the left"
 # Swap position with the sibling on the left
 # returns the node it exchanged with on success, undef if it is already leftmost sibling
 #
@@ -1346,16 +1388,20 @@ Not doing so will have unpredictable results.
 
 =head1 AUTHORS
 
-Code by Ian Docherty E<lt>pause@icydee.comE<gt>
+Code by Ian Docherty E<lt>pause@iandocherty.comE<gt>
 
 Based on original code by Florian Ragwitz E<lt>rafl@debian.orgE<gt>
 
 Incorporating ideas and code from Pedro Melo E<lt>melo@simplicidade.org<gt>
 
+Thanks to Moritz Lenz for bug fixes and implementing take_cutting
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009 The above authors
+Copyright (c) 2009-2011 The above authors
 
-This is free software. You may distribute this code under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
